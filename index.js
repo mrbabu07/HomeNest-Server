@@ -44,6 +44,11 @@ async function run() {
       res.send(result);
     });
 
+    app.get('/getServices', async (req, res) => {
+        const result = await HomeNestServices.find().toArray();
+        res.send(result);
+    });
+
     console.log("Connected to MongoDB!");
   } catch (err) {
     console.error(err);
