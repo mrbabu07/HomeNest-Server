@@ -29,16 +29,19 @@ async function run() {
 
     // POST ROUTE
     app.post("/addService", async (req, res) => {
-      const data = {
-        name: "Modern Flat in Dhanmondi",
-        description: "2-bedroom modern apartment with gym and pool.",
-        category: "Rent",
-        price: 65000,
-        location: "Dhanmondi 27, Dhaka",
-        imageURL: "https://example.com/dhanmondi-flat.jpg",
-        userEmail: "mrjabedpuc@gmail.com",
-        userName: "Jabed Hasan",
-      };
+    //   const data = {
+    //     name: "Modern Flat in Dhanmondi",
+    //     description: "2-bedroom modern apartment with gym and pool.",
+    //     category: "Rent",
+    //     price: 65000,
+    //     location: "Dhanmondi 27, Dhaka",
+    //     imageURL: "https://example.com/dhanmondi-flat.jpg",
+    //     userEmail: "mrjabedpuc@gmail.com",
+    //     userName: "Jabed Hasan",
+    //   };
+
+        const data = req.body;
+        console.log("Received data:", data);
 
       const result = await HomeNestServices.insertOne(data);
       res.send(result);
