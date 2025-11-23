@@ -1,4 +1,5 @@
 const express = require("express");
+const { ObjectId } = require("mongodb");
 const cors = require("cors");
 const port = 3000;
 
@@ -29,27 +30,44 @@ async function run() {
 
     // POST ROUTE
     app.post("/addService", async (req, res) => {
-    //   const data = {
-    //     name: "Modern Flat in Dhanmondi",
-    //     description: "2-bedroom modern apartment with gym and pool.",
-    //     category: "Rent",
-    //     price: 65000,
-    //     location: "Dhanmondi 27, Dhaka",
-    //     imageURL: "https://example.com/dhanmondi-flat.jpg",
-    //     userEmail: "mrjabedpuc@gmail.com",
-    //     userName: "Jabed Hasan",
-    //   };
+      //   const data = {
+      //     name: "Modern Flat in Dhanmondi",
+      //     description: "2-bedroom modern apartment with gym and pool.",
+      //     category: "Rent",
+      //     price: 65000,
+      //     location: "Dhanmondi 27, Dhaka",
+      //     imageURL: "https://example.com/dhanmondi-flat.jpg",
+      //     userEmail: "mrjabedpuc@gmail.com",
+      //     userName: "Jabed Hasan",
+      //   };
 
-        const data = req.body;
-        console.log("Received data:", data);
+      const data = req.body;
+      console.log("Received data:", data);
 
       const result = await HomeNestServices.insertOne(data);
       res.send(result);
     });
 
-    app.get('/getServices', async (req, res) => {
-        const result = await HomeNestServices.find().toArray();
+    app.get("/getServices", async (req, res) => {
+      const result = await HomeNestServices.find().sort({_id: -1}).limit(6).toArray();
+      res.send(result);
+    });
+
+    app.get("/allServices", async (req, res) => {
+      const result = await HomeNestServices.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/singleService/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) }; // convert string id to ObjectId
+        const result = await HomeNestServices.findOne(query); // <-- use correct collection
         res.send(result);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: "Failed to fetch property" });
+      }
     });
 
     console.log("Connected to MongoDB!");
