@@ -5,7 +5,7 @@ const port = 3000;
 
 const app = express();
 
-// MIDDLEWARE (missing before!)
+// Middleware
 app.use(cors());
 app.use(express.json());
 
@@ -28,41 +28,34 @@ async function run() {
     const database = client.db("homeNest");
     const HomeNestServices = database.collection("HomeServices");
 
-    // POST ROUTE
+    console.log("Connected to MongoDB!");
+
+    // POST: Add Service
     app.post("/addService", async (req, res) => {
-      //   const data = {
-      //     name: "Modern Flat in Dhanmondi",
-      //     description: "2-bedroom modern apartment with gym and pool.",
-      //     category: "Rent",
-      //     price: 65000,
-      //     location: "Dhanmondi 27, Dhaka",
-      //     imageURL: "https://example.com/dhanmondi-flat.jpg",
-      //     userEmail: "mrjabedpuc@gmail.com",
-      //     userName: "Jabed Hasan",
-      //   };
-
       const data = req.body;
-      console.log("Received data:", data);
-
       const result = await HomeNestServices.insertOne(data);
       res.send(result);
     });
 
+    // GET: Latest 6 services
     app.get("/getServices", async (req, res) => {
-      const result = await HomeNestServices.find().sort({_id: -1}).limit(6).toArray();
+      const result = await HomeNestServices.find().sort({ _id: -1 }).limit(6).toArray();
       res.send(result);
     });
 
+    // GET: All services
     app.get("/allServices", async (req, res) => {
       const result = await HomeNestServices.find().toArray();
       res.send(result);
     });
 
+    // GET: Single service
     app.get("/singleService/:id", async (req, res) => {
       try {
         const id = req.params.id;
-        const query = { _id: new ObjectId(id) }; // convert string id to ObjectId
-        const result = await HomeNestServices.findOne(query); // <-- use correct collection
+        const query = { _id: new ObjectId(id) };
+        const result = await HomeNestServices.findOne(query);
+        if (!result) return res.status(404).send({ error: "Property not found" });
         res.send(result);
       } catch (err) {
         console.error(err);
@@ -70,25 +63,50 @@ async function run() {
       }
     });
 
-    //update
-    app.put('/updateService/:id', async (req, res) => {
-  const id = req.params.id;
-  const updateData = req.body;
+    // PUT: Update service
+    app.put("/updateService/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const updateData = req.body;
 
-  const result = await serviceCollection.updateOne(
-    { _id: new ObjectId(id) },
-    { $set: updateData }
-  );
+        const result = await HomeNestServices.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: updateData }
+        );
 
-  res.send(result);
-});
+        if (result.matchedCount === 0) {
+          return res.status(404).send({ error: "Property not found" });
+        }
 
+        res.send({ message: "Property updated successfully", result });
+      } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: "Failed to update property" });
+      }
+    });
 
-    console.log("Connected to MongoDB!");
+    // DELETE: Delete service
+    app.delete("/deleteService/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const result = await HomeNestServices.deleteOne({ _id: new ObjectId(id) });
+        if (result.deletedCount === 0) {
+          return res.status(404).send({ error: "Property not found" });
+        }
+        res.send({ message: "Property deleted successfully" });
+      } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: "Failed to delete property" });
+      }
+    });
+
   } catch (err) {
     console.error(err);
   }
 }
+
+
+
 run();
 
 app.get("/", (req, res) => {
