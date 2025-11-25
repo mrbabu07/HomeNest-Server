@@ -63,27 +63,47 @@ async function run() {
       }
     });
 
-    // PUT: Update service
+   // PUT: Update service
     app.put("/updateService/:id", async (req, res) => {
-      try {
-        const id = req.params.id;
-        const updateData = req.body;
+  try {
+    const { id } = req.params;
 
-        const result = await HomeNestServices.updateOne(
-          { _id: new ObjectId(id) },
-          { $set: updateData }
-        );
+    // ✅ Validate ObjectId format
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).send({ error: "Invalid property ID format" });
+    }
 
-        if (result.matchedCount === 0) {
-          return res.status(404).send({ error: "Property not found" });
-        }
+    const updateData = req.body;
 
-        res.send({ message: "Property updated successfully", result });
-      } catch (err) {
-        console.error(err);
-        res.status(500).send({ error: "Failed to update property" });
-      }
-    });
+    const result = await HomeNestServices.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: updateData }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).send({ error: "Property not found" });
+    }
+
+    res.send({ message: "Property updated successfully", result });
+
+  } catch (err) {
+    console.error("Update error:", err); // 👈 Log full error for debugging
+    res.status(500).send({ error: "Failed to update property", details: err.message });
+  }
+});
+
+    // app.put("/updateService/:id", async(req, res) =>{
+    //     const id = req.params.id;
+    //     const updateData = req.body;
+
+    //     const query = { _id: new ObjectId(id)}
+
+    //     const updateService = {
+    //         $set: updateData
+    //     }
+    //     const result = await HomeNestServices.updateOne(query, updateService);
+    //     res.send(result);
+    // })
 
     // DELETE: Delete service
     app.delete("/deleteService/:id", async (req, res) => {
