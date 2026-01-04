@@ -30,9 +30,7 @@ async function run() {
     const database = client.db("homeNest");
     const HomeNestServices = database.collection("HomeServices");
 
-    // ========================================
-    // PROPERTY ENDPOINTS
-    // ========================================
+    
 
     // ✅ ADD NEW PROPERTY
     app.post("/addService", async (req, res) => {
@@ -268,9 +266,7 @@ async function run() {
       }
     });
 
-    // ========================================
-    // REVIEW ENDPOINTS
-    // ========================================
+    
 
     // ✅ ADD REVIEW TO PROPERTY
     app.post("/singleService/:id/reviews", async (req, res) => {
@@ -357,10 +353,7 @@ async function run() {
       }
     });
 
-    // ========================================
-    // NOTIFICATION ENDPOINTS
-    // ========================================
-
+    
     // ✅ CREATE NOTIFICATION
     app.post("/api/notify", async (req, res) => {
       try {
@@ -496,9 +489,7 @@ async function run() {
       }
     });
 
-    // ========================================
-    // UTILITY ENDPOINTS
-    // ========================================
+    
 
     // ✅ FIX OLD PROPERTIES (Add missing fields)
     app.get("/fix-properties", async (req, res) => {
@@ -549,9 +540,7 @@ async function run() {
 
 run().catch(console.error);
 
-// ========================================
-// SERVER STATUS
-// ========================================
+
 
 app.get("/", (req, res) => {
   res.send("🏠 HomeNest Server is running smoothly!");
